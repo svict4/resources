@@ -1,4 +1,4 @@
-import { Hero } from "../components/blocks/hero";
+import { Hero } from "components/blocks/hero";
 
 export default function FourOhFour() {
   return (

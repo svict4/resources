@@ -48,6 +48,8 @@ type Query {
   collections: [Collection!]!
   node(id: String): Node!
   document(collection: String, relativePath: String): DocumentNode!
+  resource(relativePath: String): Resource!
+  resourceConnection(before: String, after: String, first: Float, last: Float, sort: String): ResourceConnection!
   post(relativePath: String): Post!
   postConnection(before: String, after: String, first: Float, last: Float, sort: String): PostConnection!
   global(relativePath: String): Global!
@@ -81,7 +83,27 @@ type Collection {
   documents(before: String, after: String, first: Float, last: Float, sort: String): DocumentConnection!
 }
 
-union DocumentNode = Post | Global | Author | Page
+union DocumentNode = Resource | Post | Global | Author | Page
+
+type Resource implements Node & Document {
+  title: String
+  section: String
+  body: JSON
+  id: ID!
+  _sys: SystemInfo!
+  _values: JSON!
+}
+
+type ResourceConnectionEdges {
+  cursor: String!
+  node: Resource
+}
+
+type ResourceConnection implements Connection {
+  pageInfo: PageInfo!
+  totalCount: Float!
+  edges: [ResourceConnectionEdges]
+}
 
 union PostAuthor = Author
 
@@ -257,6 +279,8 @@ type Mutation {
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   deleteDocument(collection: String, relativePath: String!): DocumentNode!
   createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateResource(relativePath: String!, params: ResourceMutation!): Resource!
+  createResource(relativePath: String!, params: ResourceMutation!): Resource!
   updatePost(relativePath: String!, params: PostMutation!): Post!
   createPost(relativePath: String!, params: PostMutation!): Post!
   updateGlobal(relativePath: String!, params: GlobalMutation!): Global!
@@ -268,10 +292,17 @@ type Mutation {
 }
 
 input DocumentMutation {
+  resource: ResourceMutation
   post: PostMutation
   global: GlobalMutation
   author: AuthorMutation
   page: PageMutation
+}
+
+input ResourceMutation {
+  title: String
+  section: String
+  body: JSON
 }
 
 input PostMutation {

@@ -1,3 +1,9 @@
+fragment ResourceParts on Resource {
+  title
+  section
+  body
+}
+
 fragment PostParts on Post {
   title
   heroImg

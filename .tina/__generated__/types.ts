@@ -73,6 +73,8 @@ export type Query = {
   collections: Array<Collection>;
   node: Node;
   document: DocumentNode;
+  resource: Resource;
+  resourceConnection: ResourceConnection;
   post: Post;
   postConnection: PostConnection;
   global: Global;
@@ -102,6 +104,20 @@ export type QueryNodeArgs = {
 export type QueryDocumentArgs = {
   collection?: InputMaybe<Scalars['String']>;
   relativePath?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryResourceArgs = {
+  relativePath?: InputMaybe<Scalars['String']>;
+};
+
+
+export type QueryResourceConnectionArgs = {
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -195,7 +211,30 @@ export type CollectionDocumentsArgs = {
   sort?: InputMaybe<Scalars['String']>;
 };
 
-export type DocumentNode = Post | Global | Author | Page;
+export type DocumentNode = Resource | Post | Global | Author | Page;
+
+export type Resource = Node & Document & {
+  __typename?: 'Resource';
+  title?: Maybe<Scalars['String']>;
+  section?: Maybe<Scalars['String']>;
+  body?: Maybe<Scalars['JSON']>;
+  id: Scalars['ID'];
+  _sys: SystemInfo;
+  _values: Scalars['JSON'];
+};
+
+export type ResourceConnectionEdges = {
+  __typename?: 'ResourceConnectionEdges';
+  cursor: Scalars['String'];
+  node?: Maybe<Resource>;
+};
+
+export type ResourceConnection = Connection & {
+  __typename?: 'ResourceConnection';
+  pageInfo: PageInfo;
+  totalCount: Scalars['Float'];
+  edges?: Maybe<Array<Maybe<ResourceConnectionEdges>>>;
+};
 
 export type PostAuthor = Author;
 
@@ -398,6 +437,8 @@ export type Mutation = {
   updateDocument: DocumentNode;
   deleteDocument: DocumentNode;
   createDocument: DocumentNode;
+  updateResource: Resource;
+  createResource: Resource;
   updatePost: Post;
   createPost: Post;
   updateGlobal: Global;
@@ -433,6 +474,18 @@ export type MutationCreateDocumentArgs = {
   collection?: InputMaybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
+};
+
+
+export type MutationUpdateResourceArgs = {
+  relativePath: Scalars['String'];
+  params: ResourceMutation;
+};
+
+
+export type MutationCreateResourceArgs = {
+  relativePath: Scalars['String'];
+  params: ResourceMutation;
 };
 
 
@@ -484,10 +537,17 @@ export type MutationCreatePageArgs = {
 };
 
 export type DocumentMutation = {
+  resource?: InputMaybe<ResourceMutation>;
   post?: InputMaybe<PostMutation>;
   global?: InputMaybe<GlobalMutation>;
   author?: InputMaybe<AuthorMutation>;
   page?: InputMaybe<PageMutation>;
+};
+
+export type ResourceMutation = {
+  title?: InputMaybe<Scalars['String']>;
+  section?: InputMaybe<Scalars['String']>;
+  body?: InputMaybe<Scalars['JSON']>;
 };
 
 export type PostMutation = {
@@ -627,6 +687,8 @@ export type BlogPostQueryQueryVariables = Exact<{
 
 export type BlogPostQueryQuery = { __typename?: 'Query', post: { __typename?: 'Post', title?: string | null, heroImg?: string | null, excerpt?: any | null, date?: string | null, _body?: any | null, author?: { __typename?: 'Author', name?: string | null, avatar?: string | null, id: string } | null }, global: { __typename?: 'Global', header?: { __typename: 'GlobalHeader', color?: string | null, icon?: { __typename: 'GlobalHeaderIcon', color?: string | null, style?: string | null, name?: string | null } | null, nav?: Array<{ __typename: 'GlobalHeaderNav', href?: string | null, label?: string | null } | null> | null } | null, footer?: { __typename: 'GlobalFooter', color?: string | null, social?: { __typename: 'GlobalFooterSocial', facebook?: string | null, twitter?: string | null, instagram?: string | null, github?: string | null } | null } | null, theme?: { __typename: 'GlobalTheme', color?: string | null, font?: string | null, icon?: string | null, darkMode?: string | null } | null } };
 
+export type ResourcePartsFragment = { __typename?: 'Resource', title?: string | null, section?: string | null, body?: any | null };
+
 export type PostPartsFragment = { __typename?: 'Post', title?: string | null, heroImg?: string | null, excerpt?: any | null, date?: string | null, _body?: any | null, author?: { __typename?: 'Author', id: string } | null };
 
 export type GlobalPartsFragment = { __typename?: 'Global', header?: { __typename: 'GlobalHeader', color?: string | null, icon?: { __typename: 'GlobalHeaderIcon', color?: string | null, style?: string | null, name?: string | null } | null, nav?: Array<{ __typename: 'GlobalHeaderNav', href?: string | null, label?: string | null } | null> | null } | null, footer?: { __typename: 'GlobalFooter', color?: string | null, social?: { __typename: 'GlobalFooterSocial', facebook?: string | null, twitter?: string | null, instagram?: string | null, github?: string | null } | null } | null, theme?: { __typename: 'GlobalTheme', color?: string | null, font?: string | null, icon?: string | null, darkMode?: string | null } | null };
@@ -634,6 +696,24 @@ export type GlobalPartsFragment = { __typename?: 'Global', header?: { __typename
 export type AuthorPartsFragment = { __typename?: 'Author', name?: string | null, avatar?: string | null };
 
 export type PagePartsFragment = { __typename?: 'Page', blocks?: Array<{ __typename: 'PageBlocksHero', tagline?: string | null, headline?: string | null, text?: any | null, color?: string | null, actions?: Array<{ __typename: 'PageBlocksHeroActions', label?: string | null, type?: string | null, icon?: boolean | null, link?: string | null } | null> | null, image?: { __typename: 'PageBlocksHeroImage', src?: string | null, alt?: string | null } | null } | { __typename: 'PageBlocksFeatures', color?: string | null, items?: Array<{ __typename: 'PageBlocksFeaturesItems', title?: string | null, text?: string | null, icon?: { __typename: 'PageBlocksFeaturesItemsIcon', color?: string | null, style?: string | null, name?: string | null } | null } | null> | null } | { __typename: 'PageBlocksContent', body?: any | null, color?: string | null } | { __typename: 'PageBlocksTestimonial', quote?: string | null, author?: string | null, color?: string | null } | null> | null };
+
+export type ResourceQueryVariables = Exact<{
+  relativePath: Scalars['String'];
+}>;
+
+
+export type ResourceQuery = { __typename?: 'Query', resource: { __typename?: 'Resource', id: string, title?: string | null, section?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } };
+
+export type ResourceConnectionQueryVariables = Exact<{
+  before?: InputMaybe<Scalars['String']>;
+  after?: InputMaybe<Scalars['String']>;
+  first?: InputMaybe<Scalars['Float']>;
+  last?: InputMaybe<Scalars['Float']>;
+  sort?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type ResourceConnectionQuery = { __typename?: 'Query', resourceConnection: { __typename?: 'ResourceConnection', totalCount: number, edges?: Array<{ __typename?: 'ResourceConnectionEdges', node?: { __typename?: 'Resource', id: string, title?: string | null, section?: string | null, body?: any | null, _sys: { __typename?: 'SystemInfo', filename: string, basename: string, breadcrumbs: Array<string>, path: string, relativePath: string, extension: string } } | null } | null> | null } };
 
 export type PostQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -751,6 +831,13 @@ export const LayoutQueryFragmentFragmentDoc = gql`
   }
 }
     ${GlobalPartsFragmentDoc}`;
+export const ResourcePartsFragmentDoc = gql`
+    fragment ResourceParts on Resource {
+  title
+  section
+  body
+}
+    `;
 export const PostPartsFragmentDoc = gql`
     fragment PostParts on Post {
   title
@@ -865,6 +952,53 @@ export const BlogPostQueryDocument = gql`
 }
     ${LayoutQueryFragmentFragmentDoc}
 ${PostPartsFragmentDoc}`;
+export const ResourceDocument = gql`
+    query resource($relativePath: String!) {
+  resource(relativePath: $relativePath) {
+    ... on Document {
+      _sys {
+        filename
+        basename
+        breadcrumbs
+        path
+        relativePath
+        extension
+      }
+      id
+    }
+    ...ResourceParts
+  }
+}
+    ${ResourcePartsFragmentDoc}`;
+export const ResourceConnectionDocument = gql`
+    query resourceConnection($before: String, $after: String, $first: Float, $last: Float, $sort: String) {
+  resourceConnection(
+    before: $before
+    after: $after
+    first: $first
+    last: $last
+    sort: $sort
+  ) {
+    totalCount
+    edges {
+      node {
+        ... on Document {
+          _sys {
+            filename
+            basename
+            breadcrumbs
+            path
+            relativePath
+            extension
+          }
+          id
+        }
+        ...ResourceParts
+      }
+    }
+  }
+}
+    ${ResourcePartsFragmentDoc}`;
 export const PostDocument = gql`
     query post($relativePath: String!) {
   post(relativePath: $relativePath) {
@@ -1064,6 +1198,12 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
       },
     BlogPostQuery(variables: BlogPostQueryQueryVariables, options?: C): Promise<{data: BlogPostQueryQuery, variables: BlogPostQueryQueryVariables, query: string}> {
         return requester<{data: BlogPostQueryQuery, variables: BlogPostQueryQueryVariables, query: string}, BlogPostQueryQueryVariables>(BlogPostQueryDocument, variables, options);
+      },
+    resource(variables: ResourceQueryVariables, options?: C): Promise<{data: ResourceQuery, variables: ResourceQueryVariables, query: string}> {
+        return requester<{data: ResourceQuery, variables: ResourceQueryVariables, query: string}, ResourceQueryVariables>(ResourceDocument, variables, options);
+      },
+    resourceConnection(variables?: ResourceConnectionQueryVariables, options?: C): Promise<{data: ResourceConnectionQuery, variables: ResourceConnectionQueryVariables, query: string}> {
+        return requester<{data: ResourceConnectionQuery, variables: ResourceConnectionQueryVariables, query: string}, ResourceConnectionQueryVariables>(ResourceConnectionDocument, variables, options);
       },
     post(variables: PostQueryVariables, options?: C): Promise<{data: PostQuery, variables: PostQueryVariables, query: string}> {
         return requester<{data: PostQuery, variables: PostQueryVariables, query: string}, PostQueryVariables>(PostDocument, variables, options);
